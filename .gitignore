@@ -90,7 +90,7 @@ $RECYCLE.BIN/
 *.d
 *.properties
 *.bash
-
+*.depend
 # automatically genarated makefiles
 Makefile
 *.mk

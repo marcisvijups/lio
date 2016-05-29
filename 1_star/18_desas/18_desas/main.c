@@ -1,163 +1,170 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   main.c
- * Author: marcis.vijups
- *
- * Created on May 18, 2016, 2:24 PM
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int main()
+int checkwin(int grid[])
 {
-    FILE *f =fopen("desas.in","r+");
-    //read
-    int mas[3][3] = { 0 };
-    char protocol[255] = {0};
-    int len = 0;
-    int i , j , x,simboli;
-    char c ;
-    fscanf(f,"%s",&protocol);
-    fclose(f);
-    int win1 = 0;
-    int win2 = 0;
-    for (i = 0; i < 3 ; i++)
-    {
-        for (j = 0; j < 3; j++)
-        {
-            mas[i][j]=0;
-            //printf("%d ",mas[i][j]);
-        }
-        //printf("\n");
-    }
+//check rows
+    if((grid[1] == grid[2]) && (grid[2] == grid[3]) && (grid[3] != 0))
+        return 1;
 
+    if((grid[4] == grid[5]) && (grid[5] == grid[6]) && (grid[5] != 0))
+        return 1;
 
-    simboli = 0;
+    if((grid[7] == grid[8]) && (grid[8] == grid[9]) && (grid[8] != 0))
+        return 1;
+//check columns
+    if((grid[1] == grid[4]) && (grid[4] == grid[7]) && (grid[4] != 0))
+        return 1;
 
-    len = strlen(protocol);
+    if((grid[2] == grid[5]) && (grid[5] == grid[8]) && (grid[5] != 0))
+        return 1;
 
+    if((grid[3] == grid[6]) && (grid[6] == grid[9]) && (grid[6] != 0))
+        return 1;
 
-    f = fopen("desas.out","w+");
-    //vai garums nepaarsniedz atlauto ?
-    if(len>9)
-        fprintf(f,"NEKOREKTS");
-    else
-    {
-    //vai atkaartojas simboli vai arii ir nekorekti ?
-        for (i = 0; i < len-1 ; i++)
-        {
-            c = protocol[i];
-            for(j = i+1 ; j < len ; j ++)
-            {
-                if (
-                    (protocol[j] == c)    ||
-                    (protocol[j] - 48 > 9)||
-                    (protocol[j] - 48 < 1)
-                    )
+//check diagonals
+    if((grid[1] == grid[5]) && (grid[1] == grid[9]) && (grid[1] != 0))
+        return 1;
 
-                {
-                    simboli =1;
-                    break;
-                }
-            }
-        }
-        if(simboli)
-            fprintf(f,"NEKOREKTS");
+    if((grid[3] == grid[5]) && (grid[3] == grid[7]) && (grid[3] != 0))
+        return 1;
 
-        else
-        {
-
-            //savada veertiibas 2d masiivaa
-            i = j =0;
-            int x = 0;
-            int y = 0;
-            int turn = -1;
-            for(i = 0 ; i < len ; i++)
-            {
-                y = ((protocol[i]-48)-1)/3;
-                x = ((protocol[i]-48)-1)%3;
-                if(!mas[y][x])
-                    mas[y][x] = turn;
-                else
-                {
-                    fprintf(f,"NEKOREKTS");
-                    simboli =1 ;
-                    break;
-                }
-                turn=turn * (-1);
-
-            }
-
-            if(! simboli)
-            {
-
-
-                //paarbaudiit vai kaads uzvareeja
-
-                int sum1 , sum2 , dia1, dia2;
-                for (i = 0; i < 3 ; i++)
-                {
-                    sum1 = 0;
-                    sum2 = 0;
-                    for (j = 0; j < 3; j++)
-                    {
-                        sum1  += mas[i][j];
-                        sum2  += mas[j][i];
-                    }
-                    if (sum1 == -3 || sum2 == -3)
-                        win1 ++;
-                    if (sum1 == 3 || sum2 == 3)
-                        win2 ++;
-
-                }
-                dia1 = dia2 = 0;
-                dia1 =( mas[0][0] + mas[1][1] + mas[2][2]);
-                dia2 = (mas[0][2]+mas[1][1]+ mas[2][0]);
-
-                if(dia1 == -3 || dia2 == -3)
-                    win1 ++;
-                if (dia1 == 3 || dia2 == 3)
-                    win2 ++;
-
-                if((len < 9 && !win1 && ! win2 ) || win1>2 || win2 >2)
-                    fprintf(f,"NEKOREKTS");
-                else
-                {
-                    if(len == 9 && !win1 && !win2)
-                        fprintf(f,"NEVIENS");
-                    else
-                    {
-                        if(len == 9 && win1 && win2)
-                            fprintf(f,"NEKOREKTS");
-                        else
-                        {
-                            if (win1 && win2)
-                                fprintf(f,"NEKOREKTS");
-                            else
-                            {
-                                if(win1)
-                                    fprintf(f,"PIRMAIS");
-                                else
-                                    if(win2)
-                                        fprintf(f,"OTRAIS");
-                            }
-                        }
-                    }
-
-                }
-
-            }
-
-
-        }
-    }
-
-    fclose(f);
     return 0;
 }
+
+
+int main()
+{
+    char protocol[30];
+    FILE *inFile = fopen("desas.in","r+");
+    int gar = 0;
+    fscanf(inFile,"%s",protocol);
+    gar = strlen(protocol);
+    fclose(inFile);
+
+
+
+
+    FILE *outFile = fopen("desas.out","w+");
+    //check for invalid protocol length
+    if(gar > 9)
+    {
+        fprintf(outFile,"NEKOREKTS");
+        fclose(outFile);
+        return 0;
+    }
+
+    // Validation against incorrect symbols
+    int i,j;
+    char c;
+    int mas[10] ={0};
+    for(i = 0 ; i < gar; i++)
+    {
+        c = protocol[i];
+        if ((c-48 < 1)|| (c-48 > 9))
+        {
+            fprintf(outFile,"NEKOREKTS");
+            fclose(outFile);
+            return 0;
+        }
+        else
+        {
+            mas[i] = c-48;
+        }
+    }
+
+    //check for repetitive moves
+    for(i = 0 ; i < gar-1; i++)
+    {
+
+        for(j = i+1; j < gar; j++)
+        {
+            if(mas[i]==mas[j])
+            {
+                fprintf(outFile,"NEKOREKTS");
+                fclose(outFile);
+                return 0;
+            }
+        }
+    }
+
+    //check if there is a winner ? And if they kept playing after someone won?
+
+    int win1 = 0;
+    int win2 = 0;
+    int p1move = 1;
+    int grid[10] = { 0 };
+    int move = 0;
+
+    for (i = 0 ; i < gar; i++)
+    {
+
+        move = mas[i];
+        if(p1move)
+        {
+            grid[move] = 1;
+            win1 = checkwin(grid);
+            p1move = 0;
+        }
+        else
+        {
+            grid[move] = -1;
+            win2 = checkwin(grid);
+            p1move = 1;
+        }
+
+        // check if they kept playing after someone won
+        // (should also eliminate the case where there are 2 winners)
+        if((win1 || win2)&& i<gar-1)
+        {
+            fprintf(outFile,"NEKOREKTS");
+            fclose(outFile);
+            return 0;
+        }
+
+
+    }
+    //check for unfinished game
+    if((!win1 && !win2)&&gar < 9)
+    {
+        fprintf(outFile,"NEKOREKTS");
+        fclose(outFile);
+        return 0;
+    }
+    else
+    {
+    //check for draw
+        if((!win1 && !win2)&&gar == 9)
+        {
+            fprintf(outFile,"NEVIENS");
+            fclose(outFile);
+            return 0;
+        }
+        else
+        {
+            if(win1)
+            {
+                fprintf(outFile,"PIRMAIS");
+                fclose(outFile);
+                return 0;
+            }
+            else
+            {
+                if(win2)
+                {
+                    fprintf(outFile,"OTRAIS");
+                    fclose(outFile);
+                    return 0;
+                }
+            }
+        }
+    }
+
+
+    // TODO : I don't think we can even get here  ?
+    // rework logic to avoid repetitive return statements.
+    fclose(outFile);
+    return 0;
+}
+
