@@ -101,3 +101,8 @@ Makefile
 *.dat
 *.rez
 
+# ========================= other junk from using macOS
+*.plist
+*.yml
+main
+bin/
